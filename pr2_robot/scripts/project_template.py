@@ -124,10 +124,6 @@ def euclidean_clustering(cloud):
 
     return cluster_indices
     
-def at_goal(pos, goal):
-    tolerance = .01
-    result = abs(pos - goal) <= abs(tolerance)
-    return result
 
 def turn_pr2(pos, wait=True):
     time_elapsed = rospy.Time.now()
