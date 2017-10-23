@@ -39,14 +39,20 @@ if __name__ == '__main__':
     # Disable gravity and delete the ground plane
     initial_setup()
     labeled_features = []
+    
+    number_of_poses = 50
+
+    print("Starting to roll,...")
 
     for model_name in models:
         spawn_model(model_name)
-
-        for i in range(100):
-            # make n attempts to get a valid a point cloud then give up
+        print("Now rolling,... : {}".format(model_name))
+        for i in range(number_of_poses):
+            print("Attempt number,.. : {} - {}".format(model_name , i+1))
+            # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
+            sample_cloud = None
             while not sample_was_good and try_count < 5:
                 sample_cloud = capture_sample()
                 sample_cloud_arr = ros_to_pcl(sample_cloud).to_array()
@@ -59,13 +65,20 @@ if __name__ == '__main__':
                     sample_was_good = True
 
             # Extract histogram features
+            print("Computing histograms.,,.")
             chists = compute_color_histograms(sample_cloud, using_hsv=True)
             normals = get_normals(sample_cloud)
-            nhists = compute_normal_histograms(normals)
+            nhists = compute_normal_histograms(normals)                        
             feature = np.concatenate((chists, nhists))
             labeled_features.append([feature, model_name])
 
+        print("Delete the added model of,... {} ".format(model_name))
         delete_model()
+        print("Succesfully deleted model of,... {} ".format(model_name))
 
-
+    print("Dumping data to 'training_set.sav'")
     pickle.dump(labeled_features, open('training_set.sav', 'wb'))
+
+
+
+
